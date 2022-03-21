@@ -1,0 +1,13 @@
+/node_modules
+/dist
+.umi
+.umi-production
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.uploadrc
+.DS_Store
+.idea/
+lib/
+es/
+esm/
