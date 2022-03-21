@@ -3,7 +3,6 @@ import fs from 'fs';
 import { join } from 'path';
 
 type RevMapOptions<T> = {
-
   /** 子节点的 key */
   childKey?: string;
 
@@ -18,11 +17,7 @@ type RevMapOptions<T> = {
  * @param callback 返回值处理
  * @param options 配置
  */
- function revFlatMap<T extends Object>(
-  data: T[],
-  callback: (d: T, parent: T | undefined, index: number) => T | undefined,
-  options: RevMapOptions<T> = {},
-): T[] {
+function revFlatMap<T extends Object>(data: T[], callback: (d: T, parent: T | undefined, index: number) => T | undefined, options: RevMapOptions<T> = {}): T[] {
   const { childrenFirst, childKey = 'children', parent } = options;
   const res: T[] = [];
   data.forEach((datum, index) => {
@@ -72,28 +67,35 @@ export default (api: IApi) => {
     },
   });
 
-
   let routeList = [] as any[];
-  api.modifyRoutes((routes) => {
-    routeList = revFlatMap(routes, (item) => {return item;}, {
-      childrenFirst: true,
-      childKey: 'routes',
-    }).filter((route) => {
-      if (route.path?.includes(':')) {
-        return false;
-      }
-      if (route.path?.startsWith('/exception/')) {
-        return false;
-      }
-      if (route.path === '/') {
-        return false;
-      }
-      return route.exact;
-    }).map((route) => {
-      return route.path;
-    });
+  api.modifyRoutes({
+    fn: (routes) => {
+      routeList = revFlatMap(
+        routes,
+        (item) => {
+          return item;
+        },
+        { childrenFirst: true, childKey: 'routes' },
+      )
+        .filter((route) => {
+          if (route.path?.includes(':')) {
+            return false;
+          }
+          if (route.path?.startsWith('/exception/')) {
+            return false;
+          }
+          if (route.path === '/') {
+            return false;
+          }
+          return route.exact;
+        })
+        .map((route) => {
+          return route.path;
+        });
 
-    return routes;
+      return routes;
+    },
+    stage: 1,
   });
 
   api.onBuildComplete(() => {

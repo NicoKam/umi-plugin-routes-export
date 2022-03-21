@@ -1,6 +1,6 @@
 {
   "name": "umi-plugin-routes-export",
-  "version": "1.0.4",
+  "version": "0.0.1",
   "main": "lib/index.js",
   "description": "export project routes to output file",
   "authors": {
